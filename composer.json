@@ -2,6 +2,7 @@
     "name": "buse974/wsppserver",
     "description": "Push Pull Server PHP",
     "type": "project",
+    "license": "MIT",
     "require": {
         "php": ">=5.4",
         "cboden/ratchet": "*"
