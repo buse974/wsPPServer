@@ -1,11 +1,17 @@
 {
-    "name": "wsPPserver",
+    "name": "buse974/wsppserver",
     "description": "Push Pull Server PHP",
     "type": "project",
     "require": {
         "php": ">=5.4",
         "cboden/ratchet": "*"
     },
+    "authors": [
+        {
+	    "name": "Christophe Robert",
+	    "email": "christophe.robert@ti1.fr"
+        }
+    ],
     "require-dev": {
 	    "phing/phing": "*",
 	    "fabpot/php-cs-fixer":"*",
