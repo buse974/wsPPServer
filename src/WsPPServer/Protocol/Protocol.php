@@ -52,8 +52,9 @@ class Protocol
 		$jdata = json_decode($this->raw_string, true);
 
 		$this->methode       = $jdata['methode'];
-		$this->subscription  = $jdata['subscription'];
-		
+		if(isset($jdata['subscription'])) {
+			$this->subscription  = $jdata['subscription'];
+		}
 		if(isset($jdata['datas'])) {
 			$this->datas = $jdata['datas'];
 		}

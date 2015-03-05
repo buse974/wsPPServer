@@ -2,21 +2,34 @@ var wsppclient = (function () {
 	
 	var wsppclient = function(option) {
 		this.option = $.extend(option, { ip: "localhost", port: 8080});
-		this.connect();
-		this.subscription = [];
+		this.initsocket();
+		this.subscription = {recv: {}, discovery: {}, connect: {}, addsubscription: {}, delsubscription: {}};
 	};
-	
+
 	wsppclient.prototype = {
-		connect: function() {
+		initsocket: function() {
 			this.sock = new WebSocket("ws://" + this.option.ip + ":" + this.option.port);
 			this.sock.onopen    = this.onopen.bind(this);
 			this.sock.onclose   = this.onclose.bind(this);
 			this.sock.onmessage = this.onmessage.bind(this);
 			this.sock.onerror   = this.onerror.bind(this);
 		},
-		sendDatas: function(subscription, datas) {
+		connect: function($data, callback) {
+			if($data === undefined) { $data = this.option.connect; }
+			if($data === undefined) { throw new Error("probleme de connection"); }
+
 			this.sock.send(JSON.stringify({ 
-				methode: 'sendmessage', 
+				methode: 'connect',
+				datas: $data
+			}));
+			
+			if(callback !== undefined) {
+				this.subscription.connect = callback;
+			}
+		},
+		send: function(subscription, datas) {
+			this.sock.send(JSON.stringify({ 
+				methode: 'send', 
 				subscription: subscription, 
 				datas: datas
 			}));
@@ -26,25 +39,47 @@ var wsppclient = (function () {
 				methode: 'addsubscription', 
 				subscription: subscription
 			}));
-			this.subscription[subscription] = callback;
+			if(callback !== undefined) {
+				this.subscription.recv[subscription] = callback;
+			}
 		},
-		discovery: function(subscription) {
+		delSubscription: function(subscription, callback) {
+			this.sock.send(JSON.stringify({ 
+				methode: 'delsubscription', 
+				subscription: subscription
+			}));
+			if(callback !== undefined) {
+				this.subscription.addsubscription[subscription] = callback;
+			}
+		},
+		discovery: function(subscription, callback) {
 			this.sock.send(JSON.stringify({ 
 				methode: 'discovery', 
 				subscription: subscription
 			}));
+			if(callback !== undefined) {
+				this.subscription.discovery[subscription] = callback;
+			}
 		},
 		onmessage: function(evt) {
-			console.log(this);
 			var result = JSON.parse(evt.data);
-			this.subscription[result.subscription].call(this, result.datas);
+			
+			if(result.type === undefined) {
+				return;
+			}
+			
+			if(result.subscription !== undefined && this.subscription[result.type] &&
+					this.subscription[result.type][result.subscription] !== undefined && 
+					typeof this.subscription[result.type][result.subscription] === "function") {
+				this.subscription[result.type][result.subscription].call(this, result.datas);
+			} else if(this.subscription[result.type] && typeof this.subscription[result.type] === "function") {
+				this.subscription[result.type].call(this, result.datas);
+			}
 		},
 		onopen : function (evt) { console.log(evt); },
 		onclose : function(evt) { console.log(evt); },
 		onerror : function(evt) { console.log(evt); }
 	};
-	
-	
 	
 	return wsppclient;
 }());

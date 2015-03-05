@@ -4,18 +4,75 @@
 	<meta charset="utf-8" />
 	<title>Demo</title>
 	<style type="text/css" media="screen">
-		
+		html, body {
+			width: 100%;
+			height: 100%;
+		}
+		.label {
+			font-weight: bold;
+			display: block;
+			margin-bottom: 20px;
+			
+		}
+		#container {
+			width: 50%;
+			margin: auto;
+		}
+		.subcontainer {
+			padding: 10px;
+			margin: 20px;
+			border-left: 5px solid #4A90D9;
+		}
+		input, textarea{
+			display: block;
+			width: calc(100% - 10px);
+			margin-bottom: 5px;
+		}
+		.hide {
+			display: none;
+		}
+		.container-text {
+			border-left: 4px solid green;
+    		margin-bottom: 10px;
+    		padding-left: 8px;
+		}
 	</style>
 </head>
 <body>
-	<div class="container-chat">
+	<div id="container">
+		<div class="subcontainer connect">
+			<div class="label">Connection</div>
+			<input type="text" value="" placeholder='Connection data' id="input-connect"/>
+			<button id="btn-connect">Connecte</button>
+		</div>
+
+		<div class="subcontainer hide">
+			<div class="label">Add datas</div>
+			<div class="container-chat container-text" > </div>
+			<textarea id="text"> </textarea>
+			<input type="text" value="" placeholder="Subscription name" id="sub"/>
+			<button id="btn">Add message</button>
+		</div>
+		
+		<div class="subcontainer hide">
+			<div class="label">Add Abonnement</div>
+			<input type="text" value="" placeholder="Subscription name" id="addsub"/>
+			<button id="btnaddsub">Add subscription</button>
+		</div>
+		
+		<div class="subcontainer hide">
+			<div class="label">Delete Abonnement</div>
+			<input type="text" value="" placeholder="Subscription name" id="addsub"/>
+			<button id="btnaddsub">Delete subscription</button>
+		</div>
+		
+		<div class="subcontainer hide">
+			<div class="label">Discovery</div>
+			<div id="container-discovery" class="container-text"> </div>
+			<input type="text" value="" placeholder="Subscription name" id="input-discovery"/>
+			<button id="btn-discovery">Discovery</button>
+		</div>
 	</div>
-	<textarea id="text" name="Name" rows="8" cols="40"> </textarea>
-	<input type="text" name="some_name" value="" id="sub"/>
-	<button id="btn">Ajouter message</button>
-	<hr />
-	<input type="text" name="some_name" value="" id="addsub"/>
-	<button id="btnaddsub">Ajouter abonnement</button>
 </body>
 </html>
 <script src="http://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript" charset="utf-8"></script>
@@ -24,12 +81,23 @@
 <script type="text/javascript" charset="utf-8">
 	var wspp = new wsppclient({
 		ip: 'localhost',
-		port: 8080
+		port: 8080,
+		connect : {user:1}
 	});
+	
     $("#btn").on({
 		click: function () {
-			wspp.sendDatas($('#sub').val(), $("#text").val());
+			wspp.send($('#sub').val(), $("#text").val());
 			$("#text").val("");
+		}
+	});
+	$("#btn-discovery").on({
+		click: function () {
+			wspp.discovery($('#input-discovery').val(), function(data) {
+				console.log(data);
+				$("#container-discovery").html(JSON.stringify(data));
+			});
+			$("#input-discovery").val("");
 		}
 	});
 	$("#btnaddsub").on({
@@ -40,4 +108,14 @@
 			$("#addsub").val("");
 		}
 	});
+	$("#btn-connect").on({
+		click: function () {
+			wspp.connect($('#input-connect').val(), function () {
+				$(".subcontainer").removeClass("hide");
+				$(".connect").addClass("hide");
+			});
+			$("#input-connect").val("");
+		}
+	});
+	
 </script>
