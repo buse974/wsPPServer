@@ -41,11 +41,11 @@ class Chat implements MessageComponentInterface
     	
     	switch ($p->getMethode()) {
     		case self::MTD_ADD_SUBSCRIPT :
-    			echo " =>  " . $from->resourceId . " : subscriptions\n";
+    			echo " =>  " . $from->resourceId . " : addsubscriptions\n";
     			$this->addSubscription($from, $p->getSubscription());
     			break;
     		case self::MTD_DEL_SUBSCRIPT :
-    			echo " =>  " . $from->resourceId . " : subscriptions\n";
+    			echo " =>  " . $from->resourceId . " : delsubscriptions\n";
     			$this->delSubscription($from, $p->getSubscription());
     			break;
     		case self::MTD_SEND_DATAS :
@@ -85,13 +85,13 @@ class Chat implements MessageComponentInterface
     
     public function delSubscription($client, $subscription)
     {
-    	if(!$this->clients[$client->resourceId]['subscription']->offsetExists($subscription)) {
+    	if($this->clients[$client->resourceId]['subscription']->offsetExists($subscription)) {
     		$this->clients[$client->resourceId]['subscription']->offsetUnset($subscription);
     	}
-    	if(!$this->subscriptions[$subscription]->offsetExists($client->resourceId)) {
+    	if($this->subscriptions[$subscription]->offsetExists($client->resourceId)) {
     		$this->subscriptions[$subscription]->offsetUnset($client->resourceId);
     	}
-    	
+
     	$client->send(json_encode(array('subscription' =>  $subscription,'type' => self::MTD_DEL_SUBSCRIPT,'datas' => true)));
     }
     
@@ -107,7 +107,7 @@ class Chat implements MessageComponentInterface
     		$this->subscriptions[$subscription]->offsetSet($client->resourceId, $client);
     	}
     	
-    	$client->send(json_encode(array('subscription' =>  $subscription,'type' => 'recv','datas' => true)));
+    	$client->send(json_encode(array('subscription' =>  $subscription,'type' => self::MTD_ADD_SUBSCRIPT,'datas' => true)));
     }
     
     public function send($client, $subscription, $datas)
@@ -117,7 +117,7 @@ class Chat implements MessageComponentInterface
     	}
     	$clients = $this->subscriptions->offsetGet($subscription);
     	foreach ($clients as $id => $client) {
-    		$client->send(json_encode(array('subscription' =>  $subscription,'type' => self::MTD_SEND_DATAS, 'datas' => $datas)));
+    		$client->send(json_encode(array('subscription' =>  $subscription,'type' => 'recv', 'datas' => $datas)));
     	}
     }
     

@@ -62,8 +62,8 @@
 		
 		<div class="subcontainer hide">
 			<div class="label">Delete Abonnement</div>
-			<input type="text" value="" placeholder="Subscription name" id="addsub"/>
-			<button id="btnaddsub">Delete subscription</button>
+			<input type="text" value="" placeholder="Subscription name" id="delsub"/>
+			<button id="btndelsub">Delete subscription</button>
 		</div>
 		
 		<div class="subcontainer hide">
@@ -106,6 +106,12 @@
 				$(".container-chat").append(data + "<br />");
 			});
 			$("#addsub").val("");
+		}
+	});
+	$("#btndelsub").on({
+		click: function () {
+			wspp.delSubscription($('#delsub').val());
+			$("#delsub").val("");
 		}
 	});
 	$("#btn-connect").on({
