@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8" />
+	<title>Demo</title>
+	<style type="text/css" media="screen">
+		
+	</style>
+</head>
+<body>
+	<div class="container-chat">
+	</div>
+	<textarea id="text" name="Name" rows="8" cols="40"> </textarea>
+	<input type="text" name="some_name" value="" id="sub"/>
+	<button id="btn">Ajouter message</button>
+	<hr />
+	<input type="text" name="some_name" value="" id="addsub"/>
+	<button id="btnaddsub">Ajouter abonnement</button>
+</body>
+</html>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="wsppclient.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" charset="utf-8">
+	var wspp = new wsppclient({
+		ip: 'localhost',
+		port: 8080
+	});
+    $("#btn").on({
+		click: function () {
+			wspp.sendDatas($('#sub').val(), $("#text").val());
+			$("#text").val("");
+		}
+	});
+	$("#btnaddsub").on({
+		click: function () {
+			wspp.addSubscription($('#addsub').val(), function(data) {
+				$(".container-chat").append(data + "<br />");
+			});
+			$("#addsub").val("");
+		}
+	});
+</script>

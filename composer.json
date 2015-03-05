@@ -1,0 +1,22 @@
+{
+    "name": "wsPPserver",
+    "description": "Push Pull Server PHP",
+    "type": "project",
+    "require": {
+        "php": ">=5.4",
+        "cboden/ratchet": "*"
+    },
+    "require-dev": {
+	    "phing/phing": "*",
+	    "fabpot/php-cs-fixer":"*",
+	    "phpunit/phpunit" : "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "WsPPServer": "src"
+        }
+    },
+    "config": {
+	    "bin-dir": "bin/"	
+   }
+}
