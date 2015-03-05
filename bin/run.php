@@ -1,6 +1,6 @@
 <?php
 use Ratchet\Server\IoServer;
-use WsPPServer\Service\Chat;
+use WsPPServer\Service\PushPull;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 
@@ -9,7 +9,7 @@ use Ratchet\WebSocket\WsServer;
     $server = IoServer::factory(
         new HttpServer(
             new WsServer(
-                new Chat()
+                new PushPull()
             )
         ),
         8080

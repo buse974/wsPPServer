@@ -5,7 +5,7 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use WsPPServer\Protocol\Protocol;
 
-class Chat implements MessageComponentInterface 
+class PushPull implements MessageComponentInterface 
 {
 	const MTD_ADD_SUBSCRIPT = 'addsubscription';
 	const MTD_DEL_SUBSCRIPT = 'delsubscription';
