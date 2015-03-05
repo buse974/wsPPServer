@@ -1,3 +1,8 @@
 .buildpath
 .project
 .settings/
+bin/phing
+bin/php-cs-fixer
+bin/phpunit
+composer.lock
+vendor/

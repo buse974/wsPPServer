@@ -13,8 +13,8 @@ var wsppclient = (function () {
 			this.sock.onclose   = this.onclose.bind(this);
 			this.sock.onmessage = this.onmessage.bind(this);
 			this.sock.onerror   = this.onerror.bind(this);
-	    },
-	    sendDatas: function(subscription, datas) {
+		},
+		sendDatas: function(subscription, datas) {
 	    	this.sock.send(JSON.stringify({ 
 				methode: 'sendmessage', 
 				subscription: subscription, 
