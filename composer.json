@@ -25,5 +25,6 @@
     },
     "config": {
 	    "bin-dir": "bin/"	
-   }
+   },
+       "bin": ["bin/start.sh"]
 }
