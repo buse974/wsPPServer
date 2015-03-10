@@ -11,17 +11,20 @@ class PushPull implements MessageComponentInterface
 	const MTD_DEL_SUBSCRIPT = 'delsubscription';
 	const MTD_SEND_DATAS    = 'send';
 	const MTD_DISCOVERY     = 'discovery';
+	const MTD_DISCOVERY_CLOSE     = 'discoveryclose';
 	const MTD_CONNECT		= 'connect';
 	
 	protected $sclients;
 	protected $subscriptions;
 	protected $clients;
+	protected $discovery;
 
     public function __construct() 
     {
         $this->sclients      = new \SplObjectStorage;
         $this->subscriptions = new \ArrayObject;
         $this->clients       = new \ArrayObject;
+        $this->discovery     = new \ArrayObject();
     }
 
     public function onOpen(ConnectionInterface $conn) 
@@ -66,6 +69,15 @@ class PushPull implements MessageComponentInterface
 
     public function onClose(ConnectionInterface $conn) 
     {
+    	$my = $this->clients->offsetGet($conn->resourceId)->offsetGet('identification');
+    	foreach ($this->discovery as $discovery => $clients) {
+    		if($clients->offsetExists($conn->resourceId)) {
+    			$clients->offsetUnset($conn->resourceId);
+    			foreach ($clients as $id => $client) {
+    				$client->send(json_encode(array('subscription' =>  $discovery,'type' => self::MTD_DISCOVERY_CLOSE,'datas' => $my)));
+    			}
+    		}
+    	}
         $subscriptions = $this->clients[$conn->resourceId]['subscription'];
         foreach ($subscriptions as $id => $subscription) {
         	$this->subscriptions[$id]->offsetUnset($conn->resourceId);
@@ -126,7 +138,6 @@ class PushPull implements MessageComponentInterface
     	$this->clients->offsetSet($client->resourceId, new \ArrayObject());
     	$this->clients[$client->resourceId]->offsetSet('identification', $datas);
     	$this->clients[$client->resourceId]->offsetSet('subscription', new \ArrayObject());
-    	
     	syslog(2, 'client is connected');
     	$client->send(json_encode(array('type' => self::MTD_CONNECT, 'datas' => true)));
     }
@@ -134,11 +145,17 @@ class PushPull implements MessageComponentInterface
     public function discovery($from, $subscription)
     {
     	$cs = array();
-    	if($clients = $this->subscriptions->offsetExists($subscription)) {
-    	$clients = $this->subscriptions->offsetGet($subscription);
-	    	foreach ($clients as $id => $client) {
-	    		$cs[] = $this->clients->offsetGet($id)->offsetGet('identification');
-	    	}
+    	$my = $this->clients->offsetGet($from->resourceId)->offsetGet('identification');
+    	if(!$this->discovery->offsetExists($subscription)) {
+    		$this->discovery->offsetSet($subscription, new \ArrayObject());
+    	}
+    	$discovery = $this->discovery->offsetGet($subscription);
+    	foreach ($discovery as $id => $client) {
+    		$client->send(json_encode(array('subscription' =>  $subscription,'type' => self::MTD_DISCOVERY,'datas' => $my)));
+    		$cs[] = $this->clients->offsetGet($id)->offsetGet('identification');
+    	}
+    	if(!$this->discovery[$subscription]->offsetExists($from->resourceId)) {
+    		$this->discovery[$subscription]->offsetSet($from->resourceId, $from);
     	}
     	$from->send(json_encode(array('subscription' =>  $subscription,'type' => self::MTD_DISCOVERY,'datas' => $cs)));
     }

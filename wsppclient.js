@@ -3,16 +3,16 @@ var wsppclient = (function () {
 	var wsppclient = function(option) {
 		this.option = $.extend(option, { ip: "localhost", port: 8080});
 		this.initsocket();
-		this.subscription = {recv: {}, discovery: {}, connect: {}, addsubscription: {}, delsubscription: {}};
+		this.subscription = {recv: {}, discovery: {}, discoveryclose: {}, connect: {}, addsubscription: {}, delsubscription: {}};
 	};
 
 	wsppclient.prototype = {
 		initsocket: function() {
 			this.sock = new WebSocket("ws://" + this.option.ip + ":" + this.option.port);
-			this.sock.onopen    = this.onopen.bind(this);
-			this.sock.onclose   = this.onclose.bind(this);
+			this.sock.onopen = (this.option.onopen && typeof this.option.onopen === "function") ? this.option.onopen : this.onopen.bind(this);
+			this.sock.onclose   = (this.option.onclose && typeof this.option.onclose === "function") ? this.option.onclose : this.onclose.bind(this);
 			this.sock.onmessage = this.onmessage.bind(this);
-			this.sock.onerror   = this.onerror.bind(this);
+			this.sock.onerror   = (this.option.onerror && typeof this.option.onerror === "function") ? this.option.onerror : this.onerror.bind(this); 
 		},
 		connect: function($data, callback) {
 			if($data === undefined) { $data = this.option.connect; }
@@ -52,13 +52,14 @@ var wsppclient = (function () {
 				this.subscription.addsubscription[subscription] = callback;
 			}
 		},
-		discovery: function(subscription, callback) {
+		discovery: function(subscription, callbacks) {
 			this.sock.send(JSON.stringify({ 
 				methode: 'discovery', 
 				subscription: subscription
 			}));
-			if(callback !== undefined) {
-				this.subscription.discovery[subscription] = callback;
+			if(callbacks !== undefined) {
+				this.subscription.discovery[subscription] = callbacks.onopen;
+				this.subscription.discoveryclose[subscription] = callbacks.onclose;
 			}
 		},
 		onmessage: function(evt) {
