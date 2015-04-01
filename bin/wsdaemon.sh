@@ -7,7 +7,7 @@
 #
 # Author: Christophe Robert
 #
-DIR=`dirname "$(realpath $0)"`
+DIR=`dirname "$(readlink -f $0)"`
  
 WSSEVER="php "$DIR"/run.php"
 OPTIONS='-p 5432'
