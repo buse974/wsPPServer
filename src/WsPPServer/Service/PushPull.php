@@ -45,27 +45,27 @@ class PushPull implements MessageComponentInterface
     	
     	switch ($p->getMethode()) {
     		case self::MTD_ADD_SUBSCRIPT :
-    			echo " =>  " . $from->resourceId . " : addsubscriptions\n";
+    			syslog(1," =>  " . $from->resourceId . " : addsubscriptions");
     			$this->addSubscription($from, $p->getSubscription());
     			break;
     		case self::MTD_DEL_SUBSCRIPT :
-    			echo " =>  " . $from->resourceId . " : delsubscriptions\n";
+    			syslog(1," =>  " . $from->resourceId . " : delsubscriptions");
     			$this->delSubscription($from, $p->getSubscription());
     			break;
     		case self::MTD_SEND_DATAS :
-    			echo " =>  " . $from->resourceId . " : message\n";
+    			syslog(1," =>  " . $from->resourceId . " : message");
     			$this->send($from, $p->getSubscription(), $p->getDatas());
     			break;
     		case self::MTD_CONNECT :
-    			echo " =>  " . $from->resourceId . " : connect\n";
+    			syslog(1," =>  " . $from->resourceId . " : connect");
     			$this->connect($from, $p->getDatas());
     			break;
     		case self::MTD_DISCOVERY :
-    			echo " =>  " . $from->resourceId . " : discovery\n";
+    			syslog(1," =>  " . $from->resourceId . " : discovery");
     			$this->discovery($from, $p->getSubscription());
     			break;
     		case self::MTD_DETECT :
-    			echo " =>  " . $from->resourceId . " : detect\n";
+    			syslog(1," =>  " . $from->resourceId . " : detect");
     			$this->detect($from, $p->getSubscription());
     			break;
     	}
