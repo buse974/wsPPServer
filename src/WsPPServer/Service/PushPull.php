@@ -134,7 +134,7 @@ class PushPull implements MessageComponentInterface
     public function send($client, $subscription, $datas)
     {
     	$subscription = (string)$subscription;
-    	if(!$this->subscriptions->offsetExists()) {
+    	if(!$this->subscriptions->offsetExists($subscription)) {
     		return false;
     	}
     	$clients = $this->subscriptions->offsetGet($subscription);
