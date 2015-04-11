@@ -105,6 +105,7 @@ class PushPull implements MessageComponentInterface
     
     public function delSubscription($client, $subscription)
     {
+    	$subscription = (string)$subscription;
     	if($this->clients[$client->resourceId]['subscription']->offsetExists($subscription)) {
     		$this->clients[$client->resourceId]['subscription']->offsetUnset($subscription);
     	}
@@ -132,7 +133,8 @@ class PushPull implements MessageComponentInterface
     
     public function send($client, $subscription, $datas)
     {
-    	if(!$this->subscriptions->offsetExists($subscription)) {
+    	$subscription = (string)$subscription;
+    	if(!$this->subscriptions->offsetExists()) {
     		return false;
     	}
     	$clients = $this->subscriptions->offsetGet($subscription);
@@ -152,6 +154,7 @@ class PushPull implements MessageComponentInterface
     
     public function discovery($from, $subscription)
     {
+    	$subscription = (string)$subscription;
     	$cs = array();
     	$my = $this->clients->offsetGet($from->resourceId)->offsetGet('identification');
     	if(!$this->discovery->offsetExists($subscription)) {
@@ -170,6 +173,7 @@ class PushPull implements MessageComponentInterface
     
     public function detect($from, $subscription)
     {
+    	$subscription = (string)$subscription;
     	$cs = array();
     	if($this->discovery->offsetExists($subscription)) {
 	    	$discovery = $this->discovery->offsetGet($subscription);
