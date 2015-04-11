@@ -74,20 +74,23 @@ class PushPull implements MessageComponentInterface
 
     public function onClose(ConnectionInterface $conn) 
     {
-    	$my = $this->clients->offsetGet($conn->resourceId)->offsetGet('identification');
-    	foreach ($this->discovery as $discovery => $clients) {
-    		if($clients->offsetExists($conn->resourceId)) {
-    			$clients->offsetUnset($conn->resourceId);
-    			foreach ($clients as $id => $client) {
-    				$client->send(json_encode(array('subscription' =>  $discovery,'type' => self::MTD_DISCOVERY_CLOSE,'datas' => $my)));
-    			}
-    		}
+    	if($this->clients->offsetExists($conn->resourceId)) {
+	    	$my = $this->clients->offsetGet($conn->resourceId)->offsetGet('identification');
+	    	foreach ($this->discovery as $discovery => $clients) {
+	    		if($clients->offsetExists($conn->resourceId)) {
+	    			$clients->offsetUnset($conn->resourceId);
+	    			foreach ($clients as $id => $client) {
+	    				$client->send(json_encode(array('subscription' =>  $discovery,'type' => self::MTD_DISCOVERY_CLOSE,'datas' => $my)));
+	    			}
+	    		}
+	    	}
+	        $subscriptions = $this->clients[$conn->resourceId]['subscription'];
+	        foreach ($subscriptions as $id => $subscription) {
+	        	$this->subscriptions[$id]->offsetUnset($conn->resourceId);
+	        }
+	    	
+	        $this->clients->offsetUnset($conn->resourceId);
     	}
-        $subscriptions = $this->clients[$conn->resourceId]['subscription'];
-        foreach ($subscriptions as $id => $subscription) {
-        	$this->subscriptions[$id]->offsetUnset($conn->resourceId);
-        }
-        $this->clients->offsetUnset($conn->resourceId);
         syslog(2, "Connection {$conn->resourceId} has disconnected");
         $conn->close();
         $this->sclients->detach($conn);
