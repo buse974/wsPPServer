@@ -7,12 +7,13 @@ use WsPPServer\Protocol\Protocol;
 
 class PushPull implements MessageComponentInterface 
 {
-	const MTD_ADD_SUBSCRIPT = 'addsubscription';
-	const MTD_DEL_SUBSCRIPT = 'delsubscription';
-	const MTD_SEND_DATAS    = 'send';
-	const MTD_DISCOVERY     = 'discovery';
-	const MTD_DISCOVERY_CLOSE     = 'discoveryclose';
-	const MTD_CONNECT		= 'connect';
+	const MTD_ADD_SUBSCRIPT   = 'addsubscription';
+	const MTD_DEL_SUBSCRIPT   = 'delsubscription';
+	const MTD_SEND_DATAS      = 'send';
+	const MTD_DISCOVERY       = 'discovery';
+	const MTD_DISCOVERY_CLOSE = 'discoveryclose';
+	const MTD_CONNECT		  = 'connect';
+	const MTD_DETECT		  = 'detect';
 	
 	protected $sclients;
 	protected $subscriptions;
@@ -157,6 +158,19 @@ class PushPull implements MessageComponentInterface
     	if(!$this->discovery[$subscription]->offsetExists($from->resourceId)) {
     		$this->discovery[$subscription]->offsetSet($from->resourceId, $from);
     	}
+    	$from->send(json_encode(array('subscription' =>  $subscription,'type' => self::MTD_DISCOVERY,'datas' => $cs)));
+    }
+    
+    public function detect($from, $subscription)
+    {
+    	$cs = array();
+    	if($this->discovery->offsetExists($subscription)) {
+	    	$discovery = $this->discovery->offsetGet($subscription);
+	    	foreach ($discovery as $id => $client) {
+	    		$cs[] = $this->clients->offsetGet($id)->offsetGet('identification');
+	    	}
+    	}
+    	
     	$from->send(json_encode(array('subscription' =>  $subscription,'type' => self::MTD_DISCOVERY,'datas' => $cs)));
     }
 }
