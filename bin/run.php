@@ -30,5 +30,5 @@ use Ratchet\WebSocket\WsServer;
     	$options['h']
     );
 
-    echo "Listen >>> " . $options['h'] . ":" . $options['p'] . "\n";
+    syslog(1,"Listen >>> " . $options['h'] . ":" . $options['p'] . "\n");
     $server->run();
