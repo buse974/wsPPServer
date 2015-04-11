@@ -64,6 +64,10 @@ class PushPull implements MessageComponentInterface
     			echo " =>  " . $from->resourceId . " : discovery\n";
     			$this->discovery($from, $p->getSubscription());
     			break;
+    		case self::MTD_DETECT :
+    			echo " =>  " . $from->resourceId . " : detect\n";
+    			$this->detect($from, $p->getSubscription());
+    			break;
     	}
         unset($p);
     }
